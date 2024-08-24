@@ -24,18 +24,18 @@ class HumanSeg(data.Dataset):
         self.opt = opt
 
         if split == 'train':
-            self.image_root_folder = os.path.join(opt.data_dir,'test', 'imgs')
+            self.image_root_folder = os.path.join(opt.data_dir,'test', 'images')
             self.gt_root_folder = os.path.join(opt.data_dir,'test', 'masks')
         else:
-            self.image_root_folder = os.path.join(opt.data_dir, 'val', 'imgs')
+            self.image_root_folder = os.path.join(opt.data_dir, 'val', 'images')
             self.gt_root_folder = os.path.join(opt.data_dir, 'val', 'masks')
 
         self._read_img_mask(self.image_root_folder, self.gt_root_folder)
 
     def _read_img_mask(self, image_folder, mask_folder):
         for img_name in os.listdir(image_folder):
-            image_path = os.path.join(image_folder, img_name.split('.')[0] + '.png')
-            label_path = os.path.join(mask_folder, img_name.split('.')[0] + '.png')
+            image_path = os.path.join(image_folder, img_name.split('.')[0] + '.tif')
+            label_path = os.path.join(mask_folder, img_name.split('.')[0] + '.gif')
 
             self.images.append(image_path)
             self.labels.append(label_path)

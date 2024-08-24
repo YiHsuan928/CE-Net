@@ -14,7 +14,7 @@ class opts(object):
         self.parser.add_argument('--task', default='binSeg',
                                  help='binSeg'
                                       'binSeg: Binary Segmentation')
-        self.parser.add_argument('--dataset', default='ORIGA_OD',
+        self.parser.add_argument('--dataset', default='humanseg',
                                  help='ORIGA_OD | kitti | coco_hp | pascal')
         self.parser.add_argument('--exp_id', default='default')
         self.parser.add_argument('--test', action='store_true')
@@ -48,9 +48,9 @@ class opts(object):
                                  help='which loss type')
 
         # system
-        self.parser.add_argument('--gpus', default='3',
+        self.parser.add_argument('--gpus', default='0',
                                  help='-1 for CPU, use comma for multiple gpus')
-        self.parser.add_argument('--num_workers', type=int, default=4,
+        self.parser.add_argument('--num_workers', type=int, default=0,
                                  help='dataloader threads. 0 for single-thread.')
         self.parser.add_argument('--not_cuda_benchmark', action='store_true',
                                  help='disable when the input size is not fixed.')

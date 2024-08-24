@@ -12,12 +12,12 @@ import os
 import torch
 import torch.utils
 
-from logger import Logger
-from datasets.dataset_factory import get_dataset
-from models.model import create_model, load_model, save_model
-from trains.train_factory import train_factory
+from lib.logger import Logger
+from lib.datasets.dataset_factory import get_dataset
+from lib.models.model import create_model, load_model, save_model
+from lib.trains.train_factory import train_factory
 
-from opts import opts
+from lib.opts import opts
 
 
 def main(opt):
@@ -64,7 +64,7 @@ def main(opt):
         Dataset(opt, 'val'),
         batch_size=1,
         shuffle=False,
-        num_workers=1,
+        num_workers=0,
         pin_memory=True
     )
 
