@@ -40,7 +40,7 @@ class opts(object):
                                  help='which model')
 
         # data_root
-        self.parser.add_argument('--data_root', default='/data/zaiwang/Dataset',
+        self.parser.add_argument('--data_root', default='C:/project/CE-Net/dataset',
                                  help='which model')
 
         # loss type
@@ -95,7 +95,7 @@ class opts(object):
         self.parser.add_argument('--val_intervals', type=int, default=5,
                                  help='number of epochs to run validation.')
 
-        self.parser.add_argument('--root_dir', type=str, default='/data/zaiwang/output',
+        self.parser.add_argument('--root_dir', type=str, default='C:/project/CE-Net/dataset/output',
                                  help='the path to save training model and loggers')
 
         # dataset augmentation
