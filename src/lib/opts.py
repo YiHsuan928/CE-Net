@@ -40,7 +40,7 @@ class opts(object):
                                  help='which model')
 
         # data_root
-        self.parser.add_argument('--data_root', default='C:/project/CE-Net/dataset',
+        self.parser.add_argument('--data_root', default='C:/project/CE-Net/dataset/DRIVE/',
                                  help='which model')
 
         # loss type

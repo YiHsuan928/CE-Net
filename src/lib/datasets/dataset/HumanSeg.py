@@ -25,10 +25,10 @@ class HumanSeg(data.Dataset):
 
         if split == 'train':
             self.image_root_folder = os.path.join(opt.data_dir,'test', 'images')
-            self.gt_root_folder = os.path.join(opt.data_dir,'test', 'masks')
+            self.gt_root_folder = os.path.join(opt.data_dir,'test', 'mask')
         else:
             self.image_root_folder = os.path.join(opt.data_dir, 'val', 'images')
-            self.gt_root_folder = os.path.join(opt.data_dir, 'val', 'masks')
+            self.gt_root_folder = os.path.join(opt.data_dir, 'val', 'mask')
 
         self._read_img_mask(self.image_root_folder, self.gt_root_folder)
 
