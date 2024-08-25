@@ -8,7 +8,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.autograd import Variable
-from utils.image import mask_to_boundary
+from lib.utils.image import mask_to_boundary
 
 import cv2
 import numpy as np

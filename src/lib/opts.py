@@ -27,7 +27,9 @@ class opts(object):
         self.parser.add_argument('--demo', default='',
                                  help='path to image/ image folders/ video. '
                                       'or "webcam"')
-        self.parser.add_argument('--load_model', default='',
+        
+        # ./dataset/output/UBT_Seg/binSeg/humanseg_cenet_dice_bce_loss/model_best.pth
+        self.parser.add_argument('--load_model', default='./dataset/output/UBT_Seg/binSeg/humanseg_cenet_dice_bce_loss/model_best.pth',
                                  help='path to pretrained model')
         self.parser.add_argument('--resume', action='store_true',
                                  help='resume an experiment. '
@@ -84,7 +86,7 @@ class opts(object):
                                  help='learning rate for batch size 32.')
         self.parser.add_argument('--lr_step', type=str, default='90,120',
                                  help='drop learning rate by 10.')
-        self.parser.add_argument('--num_epochs', type=int, default=140,
+        self.parser.add_argument('--num_epochs', type=int, default=75,
                                  help='total training epochs.')
         self.parser.add_argument('--batch_size', type=int, default=24,
                                  help='batch size')
@@ -170,7 +172,7 @@ class opts(object):
         default_dataset_info = {
             'binSeg': {'default_resolution': [512, 512], 'num_classes': 1,
                        'mean': [0.408, 0.447, 0.470], 'std': [0.289, 0.274, 0.278],
-                       'dataset': 'ORIGA_OD'},
+                       'dataset': 'humanseg'},
 
         }
 

@@ -32,6 +32,7 @@ def main(opt):
     # 适用场景是网络结构固定（不是动态变化的），网络的输入形状（包括 batch size，图片大小，输入的通道）是不变的，\
     # 其实也就是一般情况下都比较适用。反之，如果卷积层的设置一直变化，将会导致程序不停地做优化，反而会耗费更多的时间。
     torch.backends.cudnn.benchmark = not opt.not_cuda_benchmark and not opt.test
+    # torch.backends.cudnn.benchmark = opt.test
 
     Dataset = get_dataset(opt.dataset, opt.task)
 
@@ -94,14 +95,17 @@ def main(opt):
         for k, v in log_dict_train.items():
             logger.scalar_summary('train_{}'.format(k), v, epoch)
             logger.write('{} {:8f} | '.format(k, v))
+            
         if opt.val_intervals > 0 and epoch % opt.val_intervals == 0:
             save_model(os.path.join(opt.save_dir, 'model_{}.pth'.format(mark)),
                        epoch, model, optimizer)
             with torch.no_grad():
-                log_dict_val, preds = trainer.val(epoch, val_loader)
+                log_dict_val, preds = trainer.val(epoch, val_loader) # 應用在test的時候 參考
+                
             for k, v in log_dict_val.items():
                 logger.scalar_summary('val_{}'.format(k), v, epoch)
                 logger.write('{} {:8f} | '.format(k, v))
+                
             if log_dict_val[opt.metric] < best:
                 best = log_dict_val[opt.metric]
                 save_model(os.path.join(opt.save_dir, 'model_best.pth'),

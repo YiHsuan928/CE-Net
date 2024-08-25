@@ -3,7 +3,7 @@
 import torch
 import numpy as np
 
-from models.losses import dice_bce_loss
+from lib.models.losses import dice_bce_loss
 from .base_trainer import BaseTrainer
 
 class binarySegLoss(torch.nn.Module):

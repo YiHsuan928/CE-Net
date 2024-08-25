@@ -113,7 +113,7 @@ class PSPModule(nn.Module):
 
     def forward(self, feats):
         h, w = feats.size(2), feats.size(3)
-        priors = [F.upsample(input=stage(feats), size=(h, w), mode='bilinear') for stage in self.stages] + [feats]
+        priors = [F.interpolate(input=stage(feats), size=(h, w), mode='bilinear') for stage in self.stages] + [feats]
         bottle = self.bottleneck(torch.cat(priors, 1))
         return self.relu(bottle)
 
@@ -130,10 +130,10 @@ class SPPblock(nn.Module):
 
     def forward(self, x):
         self.in_channels, h, w = x.size(1), x.size(2), x.size(3)
-        self.layer1 = F.upsample(self.conv(self.pool1(x)), size=(h, w), mode='bilinear')
-        self.layer2 = F.upsample(self.conv(self.pool2(x)), size=(h, w), mode='bilinear')
-        self.layer3 = F.upsample(self.conv(self.pool3(x)), size=(h, w), mode='bilinear')
-        self.layer4 = F.upsample(self.conv(self.pool4(x)), size=(h, w), mode='bilinear')
+        self.layer1 = F.interpolate(self.conv(self.pool1(x)), size=(h, w), mode='bilinear')
+        self.layer2 = F.interpolate(self.conv(self.pool2(x)), size=(h, w), mode='bilinear')
+        self.layer3 = F.interpolate(self.conv(self.pool3(x)), size=(h, w), mode='bilinear')
+        self.layer4 = F.interpolate(self.conv(self.pool4(x)), size=(h, w), mode='bilinear')
 
         out = torch.cat([self.layer1, self.layer2, self.layer3, self.layer4, x], 1)
 
@@ -183,9 +183,10 @@ class CE_Net_(nn.Module):
         self.encoder2 = resnet.layer2
         self.encoder3 = resnet.layer3
         self.encoder4 = resnet.layer4
+        
 
-        self.dblock = DACblock(512)
-        self.spp = SPPblock(512)
+        self.dblock = DACblock(filters[3])
+        self.spp = SPPblock(filters[3])
 
         self.decoder4 = DecoderBlock(516, filters[2])
         self.decoder3 = DecoderBlock(filters[2], filters[1])
@@ -197,6 +198,9 @@ class CE_Net_(nn.Module):
         self.finalconv2 = nn.Conv2d(32, 32, 3, padding=1)
         self.finalrelu2 = nonlinearity
         self.finalconv3 = nn.Conv2d(32, num_classes, 3, padding=1)
+        self.finalrelu3 = nonlinearity
+        # self.finalconv4 = nn.Conv2d(16, num_classes, 3, padding=1)
+
 
     def forward(self, x):
         # Encoder
@@ -225,7 +229,8 @@ class CE_Net_(nn.Module):
         out = self.finalconv2(out)
         out = self.finalrelu2(out)
         out = self.finalconv3(out)
-
+        # out = self.finalrelu3(out)
+        # out = self.finalconv4(out)
         return torch.sigmoid(out)
 
 
@@ -245,7 +250,6 @@ class CE_Net_backbone_DAC_without_atrous(nn.Module):
         self.encoder4 = resnet.layer4
 
         self.dblock = DACblock_without_atrous(512)
-
 
         self.decoder4 = DecoderBlock(512, filters[2])
         self.decoder3 = DecoderBlock(filters[2], filters[1])
@@ -508,7 +512,7 @@ class up(nn.Module):
     def __init__(self, in_ch, out_ch, bilinear=True):
         super(up, self).__init__()
         if bilinear:
-            self.up = nn.Upsample(scale_factor=2, mode='bilinear', align_corners=True)
+            self.up = nn.interpolate(scale_factor=2, mode='bilinear', align_corners=True)
         else:
             self.up = nn.ConvTranspose2d(in_ch // 2, in_ch // 2, 2, stride=2)
 

@@ -12,19 +12,24 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from utils.image import randomHueSaturationValue
-from utils.image import randomShiftScaleRotate
-from utils.image import randomHorizontalFlip
-from utils.image import randomVerticleFlip, randomRotate90
+from lib.utils.image import randomHueSaturationValue
+from lib.utils.image import randomShiftScaleRotate
+from lib.utils.image import randomHorizontalFlip
+from lib.utils.image import randomVerticleFlip, randomRotate90
 
 
 class BinarySegDataset(data.Dataset):
 
     def __getitem__(self, index):
         img = cv2.imread(self.images[index])
+        img = img[5:800]
         img = cv2.resize(img, (self.opt.height, self.opt.width))
+        # cv2.imshow("",img)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
 
         mask = np.array(Image.open(self.labels[index]))
+        mask = mask[5:800]
         mask = cv2.resize(mask, (self.opt.height, self.opt.width))
 
         # Data augmentation

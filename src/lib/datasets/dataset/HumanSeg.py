@@ -13,7 +13,7 @@ import torch.utils.data as data
 
 class HumanSeg(data.Dataset):
     num_classes = 1
-    default_resolution = [448, 448]
+    default_resolution = [256, 256]
     mean = np.array([0.40789654, 0.44719302, 0.47026115],
                     dtype=np.float32).reshape(1, 1, 3)
     std = np.array([0.28863828, 0.27408164, 0.27809835],
@@ -24,18 +24,21 @@ class HumanSeg(data.Dataset):
         self.opt = opt
 
         if split == 'train':
-            self.image_root_folder = os.path.join(opt.data_dir,'test', 'images')
-            self.gt_root_folder = os.path.join(opt.data_dir,'test', 'mask')
+            self.image_root_folder = os.path.join(opt.data_dir,'training', 'imgs')
+            self.gt_root_folder = os.path.join(opt.data_dir,'training', 'mask')
+        elif split == 'test':
+            self.image_root_folder = os.path.join(opt.data_dir, 'test', 'imgs')
+            self.gt_root_folder = os.path.join(opt.data_dir, 'test', 'mask')
         else:
-            self.image_root_folder = os.path.join(opt.data_dir, 'val', 'images')
+            self.image_root_folder = os.path.join(opt.data_dir, 'val', 'imgs')
             self.gt_root_folder = os.path.join(opt.data_dir, 'val', 'mask')
 
         self._read_img_mask(self.image_root_folder, self.gt_root_folder)
 
     def _read_img_mask(self, image_folder, mask_folder):
         for img_name in os.listdir(image_folder):
-            image_path = os.path.join(image_folder, img_name.split('.')[0] + '.tif')
-            label_path = os.path.join(mask_folder, img_name.split('.')[0] + '.gif')
+            image_path = os.path.join(image_folder, img_name.split('.')[0] + '.png')
+            label_path = os.path.join(mask_folder, img_name.split('.')[0] + '.png')
 
             self.images.append(image_path)
             self.labels.append(label_path)
