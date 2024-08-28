@@ -170,12 +170,12 @@ class DecoderBlock(nn.Module):
 
 
 class CE_Net_(nn.Module):
-    def __init__(self, num_classes=1, num_channels=3):
+    def __init__(self, num_classes=1, num_channels=1):
         super(CE_Net_, self).__init__()
         filters = [64, 128, 256, 512]
         # resnet = models.resnet34(pretrained=True)
         resnet = get_resnet_backbone('resnet34')(pretrain=True)
-        self.firstconv = resnet.conv1
+        self.firstconv = nn.Conv2d(num_channels, 64, kernel_size=7, stride=2, padding=3)# resnet.conv1
         self.firstbn = resnet.bn1
         self.firstrelu = resnet.relu
         self.firstmaxpool = resnet.maxpool
@@ -231,6 +231,8 @@ class CE_Net_(nn.Module):
         out = self.finalconv3(out)
         # out = self.finalrelu3(out)
         # out = self.finalconv4(out)
+        # out = torch.argmax(F.softmax(out, dim=1), dim=1)
+        # return out
         return torch.sigmoid(out)
 
 

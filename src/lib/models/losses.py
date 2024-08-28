@@ -147,8 +147,19 @@ class dice_bce_loss(nn.Module):
         return loss
 
     def __call__(self, y_true, y_pred):
+        if y_true.dim() > y_pred.dim():
+            y_true = y_true.squeeze(-1)  # 去掉最后一个维度
+        elif y_pred.dim() > y_true.dim():
+            y_pred = y_pred.squeeze(-1)  # 去掉最后一个维度
+        # y_true = y_true.float()
+        # y_pred = y_pred.float()
+        # print("y_pred requires_grad:", y_pred.requires_grad)
+        # print("y_true requires_grad:", y_true.requires_grad)
         a = self.bce_loss(y_pred, y_true)
         b = self.soft_dice_loss(y_true, y_pred)
+        # print("BCELoss requires_grad:", a.requires_grad)
+        # print("Soft Dice Loss requires_grad:", b.requires_grad)
+        # print("Soft Dice Loss grad_fn:", b.grad_fn)
 
         return b
 
