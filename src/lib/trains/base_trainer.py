@@ -21,7 +21,7 @@ class ModelWithLoss(torch.nn.Module):
         outputs = self.model(batch['input'])
         loss, loss_stats = self.loss(outputs, batch)
 
-        return outputs[-1], loss, loss_stats
+        return outputs, loss, loss_stats#[-1]
 
 
 class BaseTrainer(object):
@@ -30,6 +30,14 @@ class BaseTrainer(object):
         self.optimizer = optimizer
         self.loss_stats, self.loss = self._get_losses(opt)
         self.model_with_loss = ModelWithLoss(model, self.loss)
+        self.set_device(opt.gpus, opt.chunk_sizes, opt.device)
+        self._check_model_requires_grad()
+
+    def _check_model_requires_grad(self):
+        # 遍历模型参数并检查 requires_grad 属性
+        for name, param in self.model_with_loss.model.named_parameters():
+            if not param.requires_grad:
+                print(f"Parameter {name} does not require grad")
 
     # 2021-09-11
     # DataParallel() function: device_ids=gpus (从0开始),适用于单机多卡
@@ -50,6 +58,7 @@ class BaseTrainer(object):
         model_with_loss = self.model_with_loss
         if phase == 'train':
             model_with_loss.train()
+            self._check_model_requires_grad()
         else:
             if len(self.opt.gpus) > 1:
                 model_with_loss = self.model_with_loss.module
@@ -75,7 +84,10 @@ class BaseTrainer(object):
                     batch[k] = batch[k].to(device=opt.device, non_blocking=True)
 
             output, loss, loss_stats = model_with_loss(batch)
-
+            # if not isinstance(loss, torch.Tensor):
+            #     raise TypeError("Loss should be a Tensor but got {}".format(type(loss)))
+            # if not loss.requires_grad:
+            #     raise RuntimeError("Loss tensor does not require grad")
             loss = loss.mean()
 
             if phase == 'train':

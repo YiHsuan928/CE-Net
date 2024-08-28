@@ -11,6 +11,9 @@ from torch.autograd import Variable as V
 import cv2
 import numpy as np
 from PIL import Image
+import torch
+from torchvision import transforms
+import random
 
 from lib.utils.image import randomHueSaturationValue
 from lib.utils.image import randomShiftScaleRotate
@@ -19,19 +22,24 @@ from lib.utils.image import randomVerticleFlip, randomRotate90
 
 
 class BinarySegDataset(data.Dataset):
-
+    def image_transform(self):
+        img_transform = transforms.Compose(
+            [transforms.RandomHorizontalFlip(p=1),transforms.ColorJitter(brightness=0.2)])
+        mask_transform = transforms.Compose([transforms.RandomHorizontalFlip(p=1)])
+        return img_transform, mask_transform
+    
     def __getitem__(self, index):
-        img = cv2.imread(self.images[index])
-        img = img[5:800]
+        img = cv2.imread(self.images[index], cv2.IMREAD_GRAYSCALE)[4:]
+        img = img[:800]
         img = cv2.resize(img, (self.opt.height, self.opt.width))
         # cv2.imshow("",img)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
 
-        mask = np.array(Image.open(self.labels[index]))
-        mask = mask[5:800]
+        mask = cv2.imread(self.labels[index], cv2.IMREAD_GRAYSCALE)[4:]
+        mask = mask[:800]
         mask = cv2.resize(mask, (self.opt.height, self.opt.width))
-
+        transform = self.image_transform()
         # Data augmentation
         if self.opt.color_aug:
             img = randomHueSaturationValue(img,
@@ -54,10 +62,24 @@ class BinarySegDataset(data.Dataset):
 
         if self.opt.rotate_90:
             img, mask = randomRotate90(img, mask)
-
+        
+        p = 0.5
+        random_number = random.random()
+        if random_number < p:
+            img_pil = Image.fromarray(img.astype('uint8'))
+            mask_pil = Image.fromarray(mask.astype('uint8'))
+            img = transform[0](img_pil)
+            mask = transform[1](mask_pil)
+            img = np.array(img)
+            mask = np.array(mask)
+        
         mask = np.expand_dims(mask, axis=2)
-        img = np.array(img, np.float32).transpose(2, 0, 1) / 255.0 * 3.2 - 1.6
-        mask = np.array(mask, np.float32).transpose(2, 0, 1) / 255.0
+        img = np.array(img, np.float32)
+        img = img[np.newaxis, :, :]  # 添加通道维度，变成 (1, height, width)
+        img = img / 255.0 * 3.2 - 1.6
+        mask = np.array(mask, np.float32)
+        mask = mask[np.newaxis, :, :]  # 添加通道维度，变成 (1, height, width)
+        mask = mask/ 255.0
         mask[mask >= 0.5] = 1
         mask[mask <= 0.5] = 0
 

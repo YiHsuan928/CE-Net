@@ -101,7 +101,7 @@ class opts(object):
                                  help='the path to save training model and loggers')
 
         # dataset augmentation
-        self.parser.add_argument('--color_aug', default=True,
+        self.parser.add_argument('--color_aug', default=False,
                                  help='HSV color augmentation')
 
         self.parser.add_argument('--shift_scale', default=True,

@@ -11,7 +11,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 from lib.trains.train_factory import train_factory
 
-def val_img(path: str, opt) -> None:
+def process_and_save_image(pred, save_path):
+    if pred.max() <= 1.0:
+        pred = (pred * 255).astype(np.uint8)  # 从 [0, 1] 转换到 [0, 255]
+
+    # 黑白反转处理
+    pred = np.where(pred == 0, 255, 0)  # 将 0 转换为 255，255 转换为 0
+    # plt.imshow(pred, cmap='gray')
+    # 添加边框
+    pred = cv.copyMakeBorder(pred, 4, 225, 0, 0, 
+                borderType=cv.BORDER_CONSTANT, 
+                value=[0, 0, 0]  # 颜色为黑色 (BGR)
+            )
+    # 保存图像
+    cv.imwrite(save_path, pred)  # 使用 OpenCV 保存图像
+    plt.imsave(save_path, pred, cmap='gray')  # 使用 Matplotlib 保存图像
+
+def val_img( opt) -> None:
     save_img_path = './dataset/output/'
       
     Dataset = get_dataset(opt.dataset, opt.task)
@@ -37,16 +53,22 @@ def val_img(path: str, opt) -> None:
             pred = output.squeeze(0).squeeze(0)
             pred = pred.cpu()
             pred = pred.numpy()
-            plt.imshow(pred, cmap='gray')
-            pred = cv.resize(pred, (512, 795))
-            pred = cv.copyMakeBorder(pred, 4, 225, 0, 0, 
-                borderType=cv.BORDER_CONSTANT, 
-                value=[0, 0, 0]  # 颜色为黑色 (BGR)
-            )
-            plt.imsave(save_img_path + str(i+17) + '_test.png', pred, cmap='gray')
-    plt.show()
+            pred = cv.resize(pred, (512, 800))
+            # plt.imshow(pred, cmap='gray')
+            # pred = cv.copyMakeBorder(pred, 4, 225, 0, 0, 
+            #     borderType=cv.BORDER_CONSTANT, 
+            #     value=[0, 0, 0]  # 颜色为黑色 (BGR)
+            # )
+            original_file_name = val_loader.dataset.images[i]  # 假设 'images' 包含原始文件名
+            relative_path = os.path.relpath(original_file_name, opt.data_root)
+            save_path = os.path.join(save_img_path, relative_path)
+            output_dir = os.path.dirname(save_path)
+            os.makedirs(output_dir, exist_ok=True)
 
+
+            process_and_save_image(pred, save_path)
+            print(f'Saved result to {save_path}')
+    # plt.show()
 if __name__ == "__main__":
     opt = opts().parse()
-    val_Img_dir = "./dataset/DRIVE/humanseg/val/images/*.tif"
-    val_img(path=val_Img_dir, opt=opt)
+    val_img( opt=opt)

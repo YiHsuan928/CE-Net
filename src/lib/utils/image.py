@@ -43,8 +43,7 @@ def randomShiftScaleRotate(image, mask,
                            aspect_limit=(-0.0, 0.0),
                            borderMode=cv2.BORDER_CONSTANT, u=0.5):
     if np.random.random() < u:
-        height, width, channel = image.shape
-
+        height, width  = image.shape# channel
         angle = np.random.uniform(rotate_limit[0], rotate_limit[1])
         scale = np.random.uniform(1 + scale_limit[0], 1 + scale_limit[1])
         aspect = np.random.uniform(1 + aspect_limit[0], 1 + aspect_limit[1])
